@@ -41,14 +41,19 @@ class Engine
     true
   end
 
+  def get_bid(seat)
+    bid = seat.player.bid
+    unless valid_bid?(bid)
+      raise StandardError("Invalid Bid")
+    end
+    bid
+  end
+
   def round
     bids = []
     index = starting_seat
     seat = seats[index]
-    bid = seat.bid
-    unless valid_bid?(bid)
-      raise StandardError("Invalid Bid")
-    end
+    bid = get_bid(seat)
     notify_bid(bid)
     index += 1
 
@@ -60,10 +65,7 @@ class Engine
         next
       end
 
-      bid = seat.bid
-      unless valid_bid?(bid)
-        raise StandardError("Invalid Bid")
-      end
+      bid = get_bid(seat)
       if bid.bs_called?
         notify_bs(bid)
         break
