@@ -26,9 +26,18 @@ class Engine
     nil
   end
 
+  def valid_bs?(bid)
+    # Cannot bid BS if there isn't a previous bid
+    !!previous_bid
+  end
+
   def valid_bid?(bid)
-    if bid.bs_called? && prev_bid.nil?
-      # Cannot bid BS if there are no bids
+    if bid.bs_called?
+      return valid_bs?(bid)
+    end
+
+    if bid.number < 1 || bid.number > 6
+      # Can't bid a number that doesn't exist
       return false
     elsif bid.total < prev_bid.total
       # The total must be monotonically increasing
