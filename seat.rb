@@ -1,5 +1,5 @@
 class Seat
-  attr_accessor :number, :dice_left, :player
+  attr_accessor :number, :dice_left, :player, :dice
 
   def init(number, player, starting_dice)
     self.number = number
@@ -9,5 +9,10 @@ class Seat
 
   def alive?
     dice_left > 0
+  end
+
+  def dice=(value)
+    @dice = value
+    player.dice = value
   end
 end
