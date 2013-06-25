@@ -21,9 +21,29 @@ class Engine
     end
   end
 
-  def notify_bid(bid)
-    # TODO - send notification events
-    nil
+  def notify_bid(seat, bid)
+    event = BidMadeEvent.new(seat.number, bid)
+    notify_event(event)
+  end
+
+  def notify_bs(seat)
+    event = BSCalledEvent.new(seat.number, previous_bid)
+    notify_event(event)
+  end
+
+  def notify_loser(seat)
+    dice = seats.map(&:dice)
+    event = LoserEvent.new(seat, dice)
+    notify_event(event)
+  end
+
+  def notify_winner(seat)
+    event = WinnerEvent.new(seat)
+    notify_event(event)
+  end
+
+  def notify_event(event)
+    seats.each{|s| s.player.notify(event) }
   end
 
   def valid_bs?(bid)
