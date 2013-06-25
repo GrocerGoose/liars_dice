@@ -9,10 +9,53 @@ class Engine
     end
   end
 
-  def roll
+  def run
+    while seats.any?(&:alive?)
+      roll_dice
+      run_round
+    end
+    notify_winner(seats.detect(&:alive?))
+  end
+
+  def get_bid(seat)
+    bid = seat.player.bid
+    unless valid_bid?(bid)
+      raise StandardError("Invalid Bid")
+    end
+    bid
+  end
+
+  def run_round
+    bids = []
+    index = starting_seat
+    seat = seats[index]
+    bid = get_bid(seat)
+    notify_bid(bid)
+    index += 1
+
+    while True
+      index = 0 if index > seats.count
+      seat = seats[index]
+      if seat.lost?
+        index += 1
+        next
+      end
+
+      bid = get_bid(seat)
+      if bid.bs_called?
+        notify_bs(bid)
+        break
+      end
+
+      notify_bid(bid)
+      index += 1
+    end
+  end
+
+  def roll_dice
+    die = (1..6).to_a
     seats.select(&:alive?).each do |seat|
       dice = []
-      die = (1..6).to_a
       seat.dice_left.times do
         dice << die.sample
       end
@@ -21,6 +64,9 @@ class Engine
     end
   end
 
+  # ===========================================
+  # ====        Notification Events        ====
+  # ===========================================
   def notify_bid(seat, bid)
     event = BidMadeEvent.new(seat.number, bid)
     notify_event(event)
@@ -46,6 +92,9 @@ class Engine
     seats.each{|s| s.player.notify(event) }
   end
 
+  # ===========================================
+  # ====        Validation Methods         ====
+  # ===========================================
   def valid_bs?(bid)
     # Cannot bid BS if there isn't a previous bid
     !!previous_bid
@@ -68,41 +117,6 @@ class Engine
     end
 
     true
-  end
-
-  def get_bid(seat)
-    bid = seat.player.bid
-    unless valid_bid?(bid)
-      raise StandardError("Invalid Bid")
-    end
-    bid
-  end
-
-  def round
-    bids = []
-    index = starting_seat
-    seat = seats[index]
-    bid = get_bid(seat)
-    notify_bid(bid)
-    index += 1
-
-    while True
-      index = 0 if index > seats.count
-      seat = seats[index]
-      if seat.lost?
-        index += 1
-        next
-      end
-
-      bid = get_bid(seat)
-      if bid.bs_called?
-        notify_bs(bid)
-        break
-      end
-
-      notify_bid(bid)
-      index += 1
-    end
   end
 
   def previous_bid
