@@ -1,5 +1,13 @@
 class Engine
-  attr_accessor :seats, :starting_seat
+  attr_accessor :seats, :starting_seat, :bids
+
+  def init(player_classes, dice_per_player)
+    seat = []
+    player_classes.shuffle.each_with_index do |i, klass|
+      player = klass.new(player_classes.count, dice_per_player, i)
+      seats << Seat.new(i, player, dice_per_player)
+    end
+  end
 
   def roll
     seats.select(&:alive?).each do |seat|
@@ -18,17 +26,27 @@ class Engine
     nil
   end
 
-  def valid_bid?(bid, bs_allowed=true)
-    # TODO - validate bids
+  def valid_bid?(bid)
+    if bid.bs_called? && prev_bid.nil?
+      # Cannot bid BS if there are no bids
+      return false
+    elsif bid.total < prev_bid.total
+      # The total must be monotonically increasing
+      return false
+    elsif bid.total == prev_bid.total && bid.number <= prev_bid.number
+      # If the total does not increase, the number must
+      return false
+    end
+
     true
   end
 
   def round
-    # TODO - log bids
+    bids = []
     index = starting_seat
     seat = seats[index]
     bid = seat.bid
-    unless valid_bid?(bid, false)
+    unless valid_bid?(bid)
       raise StandardError("Invalid Bid")
     end
     notify_bid(bid)
@@ -43,6 +61,9 @@ class Engine
       end
 
       bid = seat.bid
+      unless valid_bid?(bid)
+        raise StandardError("Invalid Bid")
+      end
       if bid.bs_called?
         notify_bs(bid)
         break
@@ -53,11 +74,7 @@ class Engine
     end
   end
 
-  def init(player_classes, dice_per_player)
-    seat = []
-    player_classes.shuffle.each_with_index do |i, klass|
-      player = klass.new(player_classes.count, dice_per_player, i)
-      seats << Seat.new(i, player, dice_per_player)
-    end
+  def previous_bid
+    bids[-1]
   end
 end
