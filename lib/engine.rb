@@ -10,11 +10,11 @@ class Engine
   end
 
   def run
-    while seats.any?(&:alive?)
+    while alive_seats.count == 1
       roll_dice
       run_round
     end
-    notify_winner(seats.detect(&:alive?))
+    notify_winner(alive_seats.first)
   end
 
   def get_bid(seat)
@@ -36,7 +36,7 @@ class Engine
     while True
       index = 0 if index > seats.count
       seat = seats[index]
-      if seat.lost?
+      unless seat.alive?
         index += 1
         next
       end
@@ -54,7 +54,7 @@ class Engine
 
   def roll_dice
     die = (1..6).to_a
-    seats.select(&:alive?).each do |seat|
+    alive_seats.each do |seat|
       dice = []
       seat.dice_left.times do
         dice << die.sample
@@ -121,5 +121,9 @@ class Engine
 
   def previous_bid
     bids[-1]
+  end
+
+  def alive_seats
+    seats.select(&:alive?)
   end
 end
