@@ -32,6 +32,7 @@ class Engine
     bid = get_bid(seat)
     notify_bid(bid)
     index += 1
+    previous_seat = seat
 
     while True
       index = 0 if index > seats.count
@@ -43,12 +44,16 @@ class Engine
 
       bid = get_bid(seat)
       if bid.bs_called?
-        notify_bs(bid)
+        notify_bs(seat)
+        loser = bid_is_correct?(bid) ? seat : previous_seat
+        notify_loser(seat)
+        seat.lose_die
         break
       end
 
       notify_bid(bid)
       index += 1
+      previous_seat = seat
     end
   end
 

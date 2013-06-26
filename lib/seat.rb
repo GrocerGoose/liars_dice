@@ -15,4 +15,8 @@ class Seat
     @dice = value
     player.dice = value
   end
+
+  def lose_die
+    dice_left -= 1
+  end
 end
