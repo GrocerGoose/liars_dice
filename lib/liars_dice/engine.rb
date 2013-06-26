@@ -127,10 +127,10 @@ class Engine
     elsif bid.total < 1
       # Have to bid a positive total
       return false
-    elsif bid.total < previous_bid.total
+    elsif previous_bid && bid.total < previous_bid.total
       # The total must be monotonically increasing
       return false
-    elsif bid.total == previous_bid.total && bid.number <= previous_bid.number
+    elsif previous_bid && bid.total == previous_bid.total && bid.number <= previous_bid.number
       # If the total does not increase, the number must
       return false
     end
