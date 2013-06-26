@@ -20,6 +20,47 @@ describe "Engine" do
     end
   end
 
+  describe "#next_seat" do
+    let(:seat1) { Seat.new(0, nil, 1) }
+    let(:seat2) { Seat.new(0, nil, 1) }
+    let(:seat3) { Seat.new(0, nil, 1) }
+
+    it "only returns seats that are alive" do
+      seat1.stub(:alive?).and_return(true)
+      seat2.stub(:alive?).and_return(false)
+      seat3.stub(:alive?).and_return(true)
+
+      engine.stub(:seats).and_return([seat1, seat2, seat3])
+      returned_seats = []
+      3.times { returned_seats << engine.next_seat }
+      returned_seats.should include(seat1)
+      returned_seats.should_not include(seat2)
+      returned_seats.should include(seat3)
+    end
+
+    it "wraps around if necessary" do
+      seat1.stub(:alive?).and_return(true)
+      seat2.stub(:alive?).and_return(false)
+      seat3.stub(:alive?).and_return(true)
+
+      engine.stub(:seats).and_return([seat1, seat2, seat3])
+      returned_seats = []
+      3.times { returned_seats << engine.next_seat }
+      returned_seats.should == [seat1, seat3, seat1]
+    end
+
+    it "returns seats in order" do
+      seat1.stub(:alive?).and_return(true)
+      seat2.stub(:alive?).and_return(true)
+      seat3.stub(:alive?).and_return(true)
+
+      engine.stub(:seats).and_return([seat1, seat2, seat3])
+      returned_seats = []
+      3.times { returned_seats << engine.next_seat }
+      returned_seats.should == [seat1, seat2, seat3]
+    end
+  end
+
   describe "#roll_dice" do
     context "randomness" do
       before do

@@ -2,11 +2,12 @@ class Engine
   attr_accessor :seats, :starting_seat, :bids
 
   def initialize(player_classes, dice_per_player)
-    seat = []
+    self.seats = []
     player_classes.shuffle.each_with_index do |i, klass|
       player = klass.new(player_classes.count, dice_per_player, i)
-      seats << Seat.new(i, player, dice_per_player)
+      self.seats << Seat.new(i, player, dice_per_player)
     end
+    @seat_index = 0
   end
 
   def run
@@ -25,22 +26,25 @@ class Engine
     bid
   end
 
+  def next_seat
+    # If no seats are alive, we'd loop forever
+    return nil if alive_seats.empty?
+
+    seat = seats[@seat_index]
+    @seat_index += 1
+    @seat_index = 0 if @seat_index == seats.count
+
+    # If the seat at seat_index is alive, return it
+    # Otherwise, we've already updated seat_index (and wrapped it, if necessary)
+    # so just call next_seat again
+    seat.alive? ? seat : next_seat
+  end
+
   def run_round
     bids = []
-    index = starting_seat
-    seat = seats[index]
-    bid = get_bid(seat)
-    notify_bid(bid)
-    index += 1
-    previous_seat = seat
 
     while True
-      index = 0 if index > seats.count
-      seat = seats[index]
-      unless seat.alive?
-        index += 1
-        next
-      end
+      seat = next_seat
 
       bid = get_bid(seat)
       if bid.bs_called?
@@ -52,7 +56,6 @@ class Engine
       end
 
       notify_bid(bid)
-      index += 1
       previous_seat = seat
     end
   end
