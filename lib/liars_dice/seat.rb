@@ -1,7 +1,7 @@
 class Seat
   attr_accessor :number, :dice_left, :player, :dice
 
-  def init(number, player, starting_dice)
+  def initialize(number, player, starting_dice)
     self.number = number
     self.dice_left = starting_dice
     self.player = player

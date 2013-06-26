@@ -1,7 +1,7 @@
 class Bid
   attr_accessor :total, :number
 
-  def init(total, number)
+  def initialize(total, number)
     self.total = total
     self.number = number
   end
@@ -16,7 +16,7 @@ class Bid
 end
 
 class BS < Bid
-  def init
+  def initialize
   end
 
   def bs_called?

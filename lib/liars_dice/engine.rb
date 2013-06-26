@@ -1,7 +1,7 @@
 class Engine
   attr_accessor :seats, :starting_seat, :bids
 
-  def init(player_classes, dice_per_player)
+  def initialize(player_classes, dice_per_player)
     seat = []
     player_classes.shuffle.each_with_index do |i, klass|
       player = klass.new(player_classes.count, dice_per_player, i)
