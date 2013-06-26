@@ -4,7 +4,7 @@ class Engine
   def initialize(player_classes, dice_per_player)
     self.seats = []
     player_classes.shuffle.each_with_index do |i, klass|
-      player = klass.new(player_classes.count, dice_per_player, i)
+      player = klass.new(i, player_classes.count, dice_per_player)
       self.seats << Seat.new(i, player, dice_per_player)
     end
     @seat_index = 0
@@ -97,7 +97,7 @@ class Engine
   end
 
   def notify_event(event)
-    seats.each{|s| s.player.notify(event) }
+    seats.each{|s| s.player.handle_event(event) }
   end
 
   # ===========================================

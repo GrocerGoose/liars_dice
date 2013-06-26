@@ -228,9 +228,9 @@ describe "Engine" do
       engine.stub(:seats).and_return([s1, s2, s3])
 
       event = WinnerEvent.new(seat)
-      player1.should_receive(:notify).with(event)
-      player2.should_receive(:notify).with(event)
-      player3.should_receive(:notify).with(event)
+      player1.should_receive(:handle_event).with(event)
+      player2.should_receive(:handle_event).with(event)
+      player3.should_receive(:handle_event).with(event)
 
       engine.notify_event(event)
     end
