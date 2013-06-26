@@ -117,6 +117,8 @@ class Engine
   end
 
   def valid_bid?(bid)
+    return false unless bid
+
     if bid.bs_called?
       return valid_bs?(bid)
     end
