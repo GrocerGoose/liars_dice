@@ -48,7 +48,7 @@ class Engine
     total_dice_numbered(bid.number) >= bid.total
   end
   def run_round
-    bids = []
+    self.bids = []
 
     while true
       seat = next_seat
@@ -62,8 +62,8 @@ class Engine
         break
       end
 
-      bids << bid
-      notify_bid(bid)
+      self.bids << bid
+      notify_bid(seat, bid)
       previous_seat = seat
     end
   end
