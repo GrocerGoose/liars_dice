@@ -50,10 +50,11 @@ class Engine
   def run_round
     self.bids = []
 
+    previous_seat = nil
     while true
       seat = next_seat
-
       bid = get_bid(seat)
+
       if bid.bs_called?
         notify_bs(seat)
         loser = bid_is_correct?(previous_bid) ? seat : previous_seat
