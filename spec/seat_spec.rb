@@ -25,8 +25,22 @@ describe "Seat" do
       player.should_receive(:dice=).with([1, 2, 3])
       seat.dice = [1,2,3]
     end
+
+    it "remembers the dice" do
+      seat.dice = [4, 5, 6]
+      seat.dice.should == [4, 5, 6]
+    end
+  end
+
+  describe "#lose_die" do
+    it "adjusts the dice_left count" do
+      count = seat.dice_left
+      seat.lose_die
+      seat.dice_left.should == (count - 1)
+    end
   end
 end
+
 
 
 
