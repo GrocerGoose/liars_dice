@@ -1,9 +1,10 @@
 class Seat
-  attr_accessor :number, :dice_left, :player, :dice
+  attr_accessor :number, :player, :dice
+  attr_reader :dice_left
 
   def initialize(number, player, starting_dice)
     self.number = number
-    self.dice_left = starting_dice
+    @dice_left = starting_dice
     self.player = player
   end
 
@@ -17,6 +18,6 @@ class Seat
   end
 
   def lose_die
-    dice_left -= 1
+    @dice_left -= 1
   end
 end
