@@ -2,6 +2,8 @@ require 'spec_helper'
 
 describe "Engine" do
   let(:engine) { Engine.new([], 5) }
+  let(:seat) { Seat.new(0, nil, 5) }
+
   describe "valid_bid?" do
     before do
       engine.stub(:previous_bid).and_return(nil)
@@ -33,55 +35,97 @@ describe "Engine" do
 
     context "with a previous bid" do
       before do
-        prev = Bid.new(3, 3)
-        engine.stub(:previous_bid).and_return(prev)
+        @prev = Bid.new(3, 3)
+        engine.stub(:previous_bid).and_return(@prev)
       end
 
-      # Possibilities:
-      it "returns false if the total goes down and the number goes down" do
-        bid = Bid.new(2, 2)
-        engine.valid_bid?(bid).should == false
+      it "validates all the possible bids correctly" do
+        [[-1, -1, false],
+         [-1, 0, false],
+         [-1, 1, false],
+[-1, -1, false],
+         [-1, 0, false],
+         [-1, 1, false],
+         [-1, -1, false],
+         [-1, 0, false],
+         [-1, 1, false]].each do |total_delta, number_delta, result|
+          bid = Bid.new(@prev.total + total_delta, @prev.number + number_delta)
+          engine.valid_bid?(bid).should == result
+        end
       end
+    end
+  end
 
-      it "returns false if the total goes down and the number stays the same" do
-        bid = Bid.new(2, 3)
-        engine.valid_bid?(bid).should == false
-      end
+  describe "#valid_bs?" do
+    it "returns true if there's a previous bid" do
+      prev = Bid.new(3, 3)
+      engine.stub(:previous_bid).and_return(prev)
+      engine.valid_bs?(BS.new).should == true
+    end
 
-      it "returns false if the total goes down and the number goes up" do
-        bid = Bid.new(2, 4)
-        engine.valid_bid?(bid).should == false
-      end
+    it "returns false if there's not a previous bid" do
+      engine.stub(:previous_bid).and_return(nil)
+      engine.valid_bs?(BS.new).should == false
+    end
+  end
 
-      it "returns false if the total stays the same and the number goes down" do
-        bid = Bid.new(3, 2)
-        engine.valid_bid?(bid).should == false
-      end
+  describe "#alive_seats" do
+    it "doesn't return any seats that aren't alive" do
+      s1 = Seat.new(0, nil, 6)
+      s2 = Seat.new(0, nil, 6)
+      s1.stub(:alive?).and_return(true)
+      s2.stub(:alive?).and_return(false)
+      engine.stub(:seats).and_return([s1, s2])
+      engine.alive_seats.should == [s1]
+    end
+  end
 
-      it "returns false if the total stays the same and the number stays the same" do
-        bid = Bid.new(3, 3)
-        engine.valid_bid?(bid).should == false
-      end
+  describe "notify_bid" do
+    it "passes an BidMadeEvent to notify_event" do
+      engine.should_receive(:notify_event).with(an_instance_of(BidMadeEvent))
+      engine.notify_bid(seat, nil)
+    end
+  end
 
-      it "returns true if the total stays the same and the number goes up" do
-        bid = Bid.new(3, 4)
-        engine.valid_bid?(bid).should == true
-      end
+  describe "notify_bs" do
+    it "passes an BSCalledEvent to notify_event" do
+      engine.stub(:previous_bid).and_return(nil)
+      engine.should_receive(:notify_event).with(an_instance_of(BSCalledEvent))
+      engine.notify_bs(seat)
+    end
+  end
 
-      it "returns true if the total goes up and the number goes down" do
-        bid = Bid.new(4, 2)
-        engine.valid_bid?(bid).should == true
-      end
+  describe "notify_loser" do
+    it "passes an LoserEvent to notify_event" do
+      engine.should_receive(:notify_event).with(an_instance_of(LoserEvent))
+      engine.stub(:seats).and_return([])
+      engine.notify_loser(seat)
+    end
+  end
 
-      it "returns true if the total goes up and the number stays even" do
-        bid = Bid.new(4, 3)
-        engine.valid_bid?(bid).should == true
-      end
+  describe "notify_winner" do
+    it "passes an WinnerEvent to notify_event" do
+      engine.should_receive(:notify_event).with(an_instance_of(WinnerEvent))
+      engine.notify_winner(seat)
+    end
+  end
 
-      it "returns true if the total stays even and the number goes up" do
-        bid = Bid.new(4, 4)
-        engine.valid_bid?(bid).should == true
-      end
+  describe "notify_event" do
+    it "passes the event to all players" do
+      player1 = {}
+      s1 = Seat.new(0, player1, 5)
+      player2 = {}
+      s2 = Seat.new(0, player2, 5)
+      player3 = {}
+      s3 = Seat.new(0, player3, 5)
+      engine.stub(:seats).and_return([s1, s2, s3])
+
+      event = WinnerEvent.new(seat)
+      player1.should_receive(:notify).with(event)
+      player2.should_receive(:notify).with(event)
+      player3.should_receive(:notify).with(event)
+
+      engine.notify_event(event)
     end
   end
 end
