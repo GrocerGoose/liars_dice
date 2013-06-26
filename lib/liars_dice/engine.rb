@@ -21,7 +21,7 @@ class Engine
   def get_bid(seat)
     bid = seat.player.bid
     unless valid_bid?(bid)
-      raise StandardError("Invalid Bid")
+      raise StandardError.new("Invalid Bid")
     end
     bid
   end
