@@ -11,7 +11,7 @@ class Bid
   end
 
   def to_s
-    "#{total} #{number}s"
+    "#{total} #{number}#{"s" if total > 1}"
   end
 end
 
