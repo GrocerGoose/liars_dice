@@ -47,6 +47,7 @@ class Engine
   def bid_is_correct?(bid)
     total_dice_numbered(bid.number) >= bid.total
   end
+
   def run_round
     self.bids = []
 
@@ -58,8 +59,8 @@ class Engine
       if bid.bs_called?
         notify_bs(seat)
         loser = bid_is_correct?(previous_bid) ? seat : previous_seat
-        notify_loser(seat)
-        seat.lose_die
+        notify_loser(loser)
+        loser.lose_die
         break
       end
 
