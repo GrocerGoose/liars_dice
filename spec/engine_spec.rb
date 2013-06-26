@@ -20,6 +20,71 @@ describe "Engine" do
     end
   end
 
+  describe "#total_dice_numbered" do
+    let(:seat0) { OpenStruct.new(dice: [1, 2, 3]) }
+    let(:seat1) { OpenStruct.new(dice: [1, 2, 3]) }
+    let(:seat2) { OpenStruct.new(dice: [1, 4, 5]) }
+
+    before do
+      engine.stub(:seats).and_return([seat0, seat1, seat2])
+    end
+
+    context "with wilds" do
+      it "includes wilds when counting numbers" do
+        engine.total_dice_numbered(3).should == 5
+      end
+
+      it "doesn't double count wilds" do
+        engine.total_dice_numbered(1).should == 3
+      end
+
+      it "returns non-zero for every number" do
+        6.times {|i| engine.total_dice_numbered(i+1).should > 0 }
+      end
+    end
+
+    context "without wilds" do
+      before do
+        seat0.dice = [2, 2, 3]
+        seat1.dice = [4, 2, 3]
+        seat2.dice = [2, 4, 5]
+      end
+
+      it "returns the correct counts" do
+        engine.total_dice_numbered(1).should == 0
+        engine.total_dice_numbered(2).should == 4
+        engine.total_dice_numbered(3).should == 2
+        engine.total_dice_numbered(4).should == 2
+        engine.total_dice_numbered(5).should == 1
+        engine.total_dice_numbered(6).should == 0
+      end
+    end
+  end
+
+  describe "#bid_is_correct?" do
+    let(:bid) { Bid.new(3, 3) }
+
+    it "returns false when none of the numbers were rolled" do
+      engine.stub(:total_dice_numbered).with(3).and_return(0)
+      engine.bid_is_correct?(bid).should == false
+    end
+
+    it "returns false when less than total of the numbers were rolled" do
+      engine.stub(:total_dice_numbered).with(3).and_return(1)
+      engine.bid_is_correct?(bid).should == false
+    end
+
+    it "returns true when exactly total of the numbers were rolled" do
+    engine.stub(:total_dice_numbered).with(3).and_return(3)
+      engine.bid_is_correct?(bid).should == true
+    end
+
+    it "returns true when more than total of the numbers were rolled" do
+    engine.stub(:total_dice_numbered).with(3).and_return(6)
+      engine.bid_is_correct?(bid).should == true
+    end
+  end
+
   describe "#next_seat" do
     let(:seat1) { Seat.new(0, nil, 1) }
     let(:seat2) { Seat.new(0, nil, 1) }

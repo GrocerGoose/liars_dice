@@ -40,6 +40,14 @@ class Engine
     seat.alive? ? seat : next_seat
   end
 
+  def total_dice_numbered(number)
+    seats.map{|seat| seat.dice.count{|d| d == number || d == 1 } }.reduce(0, :+)
+  end
+
+  def bid_is_correct?(bid)
+    total_dice_numbered(bid.number) >= bid.total
+  end
+
   def run_round
     bids = []
 
@@ -49,12 +57,13 @@ class Engine
       bid = get_bid(seat)
       if bid.bs_called?
         notify_bs(seat)
-        loser = bid_is_correct?(bid) ? seat : previous_seat
+        loser = bid_is_correct?(previous_bid) ? seat : previous_seat
         notify_loser(seat)
         seat.lose_die
         break
       end
 
+      bids << bid
       notify_bid(bid)
       previous_seat = seat
     end
