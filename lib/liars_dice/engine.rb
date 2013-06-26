@@ -113,10 +113,13 @@ class Engine
     if bid.number < 1 || bid.number > 6
       # Can't bid a number that doesn't exist
       return false
-    elsif bid.total < prev_bid.total
+    elsif bid.total < 1
+      # Have to bid a positive total
+      return false
+    elsif bid.total < previous_bid.total
       # The total must be monotonically increasing
       return false
-    elsif bid.total == prev_bid.total && bid.number <= prev_bid.number
+    elsif bid.total == previous_bid.total && bid.number <= previous_bid.number
       # If the total does not increase, the number must
       return false
     end
