@@ -41,24 +41,28 @@ class Engine
   end
 
   def total_dice_numbered(number)
-    seats.map{|seat| seat.dice.count{|d| d == number || d == 1 } }.reduce(0, :+)
+    seats.map{|seat| seat.dice.count(number) }.reduce(0, :+)
   end
 
-  def bid_is_correct?(bid)
-    total_dice_numbered(bid.number) >= bid.total
+  def bid_is_correct?(bid, use_wilds)
+    total = total_dice_numbered(bid.number)
+    total += total_dice_numbered(1) if use_wilds
+    total >= bid.total
   end
 
   def run_round
     self.bids = []
 
     previous_seat = nil
+    aces_wild = true
     while true
       seat = next_seat
       bid = get_bid(seat)
+      aces_wild = false if bid.number == 1
 
       if bid.bs_called?
         notify_bs(seat)
-        loser = bid_is_correct?(previous_bid) ? seat : previous_seat
+        loser = bid_is_correct?(previous_bid, aces_wild) ? seat : previous_seat
         notify_loser(loser)
         loser.lose_die
         break
