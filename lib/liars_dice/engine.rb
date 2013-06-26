@@ -11,7 +11,7 @@ class Engine
   end
 
   def run
-    while alive_seats.count == 1
+    until alive_seats.count == 1
       roll_dice
       run_round
     end
