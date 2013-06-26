@@ -95,12 +95,12 @@ class Engine
 
   def notify_loser(seat)
     dice = seats.map(&:dice)
-    event = LoserEvent.new(seat, dice)
+    event = LoserEvent.new(seat.number, dice)
     notify_event(event)
   end
 
   def notify_winner(seat)
-    event = WinnerEvent.new(seat)
+    event = WinnerEvent.new(seat.number)
     notify_event(event)
   end
 
