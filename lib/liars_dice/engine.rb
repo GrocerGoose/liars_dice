@@ -50,7 +50,7 @@ class Engine
   def run_round
     bids = []
 
-    while True
+    while true
       seat = next_seat
 
       bid = get_bid(seat)
