@@ -20,7 +20,7 @@ describe "Engine" do
     end
   end
 
-  describe "#total_dice_numbered" do
+  describe "#total_dice_with_face_value" do
     let(:seat0) { OpenStruct.new(dice: [2, 2, 3]) }
     let(:seat1) { OpenStruct.new(dice: [4, 2, 3]) }
     let(:seat2) { OpenStruct.new(dice: [2, 4, 5]) }
@@ -31,12 +31,12 @@ describe "Engine" do
     end
 
     it "returns the correct counts" do
-      engine.total_dice_numbered(1).should == 0
-      engine.total_dice_numbered(2).should == 4
-      engine.total_dice_numbered(3).should == 2
-      engine.total_dice_numbered(4).should == 2
-      engine.total_dice_numbered(5).should == 1
-      engine.total_dice_numbered(6).should == 0
+      engine.total_dice_with_face_value(1).should == 0
+      engine.total_dice_with_face_value(2).should == 4
+      engine.total_dice_with_face_value(3).should == 2
+      engine.total_dice_with_face_value(4).should == 2
+      engine.total_dice_with_face_value(5).should == 1
+      engine.total_dice_with_face_value(6).should == 0
     end
   end
 
@@ -44,49 +44,49 @@ describe "Engine" do
     let(:bid) { Bid.new(3, 3) }
 
     before do
-      engine.stub(:total_dice_numbered).with(1).and_return(1)
+      engine.stub(:total_dice_with_face_value).with(1).and_return(1)
     end
 
     context "with wilds" do
-      it "returns false when none of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(0)
+      it "returns false when none of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(0)
         engine.bid_is_correct?(bid, true).should == false
       end
 
-      it "returns false when less than total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(1)
+      it "returns false when less than total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(1)
         engine.bid_is_correct?(bid, true).should == false
       end
 
-      it "returns true when exactly total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(2)
+      it "returns true when exactly total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(2)
         engine.bid_is_correct?(bid, true).should == true
       end
 
-      it "returns true when more than total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(6)
+      it "returns true when more than total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(6)
         engine.bid_is_correct?(bid, true).should == true
       end
     end
 
     context "without wilds" do
-      it "returns false when none of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(0)
+      it "returns false when none of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(0)
         engine.bid_is_correct?(bid, false).should == false
       end
 
-      it "returns false when less than total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(1)
+      it "returns false when less than total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(1)
         engine.bid_is_correct?(bid, false).should == false
       end
 
-      it "returns true when exactly total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(3)
+      it "returns true when exactly total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(3)
         engine.bid_is_correct?(bid, false).should == true
       end
 
-      it "returns true when more than total of the numbers were rolled" do
-        engine.stub(:total_dice_numbered).with(3).and_return(6)
+      it "returns true when more than total of the face_values were rolled" do
+        engine.stub(:total_dice_with_face_value).with(3).and_return(6)
         engine.bid_is_correct?(bid, false).should == true
       end
     end
@@ -137,7 +137,7 @@ describe "Engine" do
     context "randomness" do
       before do
         # Roll the dice a bunch of times and capture the result in a hash
-        # keyed by die number
+        # keyed by die face_value
         engine.stub(:alive_seats).and_return([seat])
         seat.stub(:dice_left).and_return(6000)
         rolled_dice = []
@@ -147,11 +147,11 @@ describe "Engine" do
         rolled_dice.each{|die| @histogram[die] += 1 }
       end
 
-      it "chooses valid numbers" do
+      it "chooses valid face_values" do
         @histogram.keys.sort.should == [1,2,3,4,5,6]
       end
 
-      it "randomly distributes numbers" do
+      it "randomly distributes face_values" do
         6.times do |i|
           @histogram[i+1].should > 800
           @histogram[i+1].should < 1200
@@ -205,7 +205,7 @@ describe "Engine" do
       engine.valid_bid?(bid).should == false
     end
 
-    it "returns false for invalid die numbers" do
+    it "returns false for invalid die face_values" do
       bid = Bid.new(5, 0)
       engine.valid_bid?(bid).should == false
       bid = Bid.new(5, 10)
@@ -227,8 +227,8 @@ describe "Engine" do
          [-1, 1, false],
          [-1, -1, false],
          [-1, 0, false],
-         [-1, 1, false]].each do |total_delta, number_delta, result|
-          bid = Bid.new(@prev.total + total_delta, @prev.number + number_delta)
+         [-1, 1, false]].each do |total_delta, face_value_delta, result|
+          bid = Bid.new(@prev.total + total_delta, @prev.face_value + face_value_delta)
           engine.valid_bid?(bid).should == result
         end
       end

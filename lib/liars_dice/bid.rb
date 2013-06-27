@@ -1,10 +1,10 @@
 module LiarsDice
   class Bid
-    attr_accessor :total, :number
+    attr_accessor :total, :face_value
 
-    def initialize(total, number)
+    def initialize(total, face_value)
       self.total = total
-      self.number = number
+      self.face_value = face_value
     end
 
     def bs_called?
@@ -12,7 +12,7 @@ module LiarsDice
     end
 
     def to_s
-      "#{total} #{number}#{"s" if total > 1}"
+      "#{total} #{face_value}#{"s" if total > 1}"
     end
   end
 

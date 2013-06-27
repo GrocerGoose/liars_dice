@@ -43,13 +43,13 @@ module LiarsDice
       seat.alive? ? seat : next_seat
     end
 
-    def total_dice_numbered(number)
-      seats.map{|seat| seat.dice.count(number) }.reduce(0, :+)
+    def total_dice_with_face_value(face_value)
+      seats.map{|seat| seat.dice.count(face_value) }.reduce(0, :+)
     end
 
     def bid_is_correct?(bid, use_wilds)
-      total = total_dice_numbered(bid.number)
-      total += total_dice_numbered(1) if use_wilds
+      total = total_dice_with_face_value(bid.face_value)
+      total += total_dice_with_face_value(1) if use_wilds
       total >= bid.total
     end
 
@@ -61,7 +61,7 @@ module LiarsDice
       while true
         seat = next_seat
         bid = get_bid(seat)
-        aces_wild = false if bid.number == 1
+        aces_wild = false if bid.face_value == 1
 
         if bid.bs_called?
           notify_bs(seat)
@@ -147,8 +147,8 @@ module LiarsDice
         return valid_bs?(bid)
       end
 
-      if bid.number < 1 || bid.number > 6
-        # Can't bid a number that doesn't exist
+      if bid.face_value < 1 || bid.face_value > 6
+        # Can't bid a face_value that doesn't exist
         return false
       elsif bid.total < 1
         # Have to bid a positive total
@@ -156,8 +156,8 @@ module LiarsDice
       elsif previous_bid && bid.total < previous_bid.total
         # The total must be monotonically increasing
         return false
-      elsif previous_bid && bid.total == previous_bid.total && bid.number <= previous_bid.number
-        # If the total does not increase, the number must
+      elsif previous_bid && bid.total == previous_bid.total && bid.face_value <= previous_bid.face_value
+        # If the total does not increase, the face_value must
         return false
       end
 
