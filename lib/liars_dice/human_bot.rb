@@ -35,7 +35,8 @@ module LiarsDice
       end
       parts = bid_string.split(" ").map(&:to_i)
       if parts.length == 2
-        return Bid.new(*parts)
+        ret = Bid.new(*parts)
+        return ret if ret.valid?
       end
       print "Invalid bid"
       return bid

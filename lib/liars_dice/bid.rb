@@ -14,6 +14,17 @@ module LiarsDice
     def to_s
       "#{total} #{face_value}#{"s" if total > 1}"
     end
+
+    def valid?
+      if face_value < 1 || face_value > 6
+        # Can't bid a face_value that doesn't exist
+        return false
+      elsif total < 1
+        # Have to bid a positive total
+        return false
+      end
+      true
+    end
   end
 
   class BS < Bid
