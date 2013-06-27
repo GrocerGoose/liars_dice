@@ -27,6 +27,15 @@ module LiarsDice
     end
   end
 
+  class DiceRolledEvent < Event
+    attr_accessor :dice
+
+    def initialize(dice)
+      self.dice = dice
+      super("Dice rolled")
+    end
+  end
+
   class LoserEvent < Event
     attr_accessor :seat_number, :dice
 

@@ -260,51 +260,122 @@ describe "Engine" do
   end
 
   describe "notify_bid" do
-    it "passes an BidMadeEvent to notify_event" do
-      engine.should_receive(:notify_event).with(an_instance_of(BidMadeEvent))
+    it "passes a BidMadeEvent to notify_players" do
+      engine.should_receive(:notify_players).with(an_instance_of(BidMadeEvent))
+      engine.notify_bid(seat, nil)
+    end
+
+    it "passes a BidMadeEvent to notify_watcher" do
+      engine.should_receive(:notify_watcher).with(an_instance_of(BidMadeEvent))
       engine.notify_bid(seat, nil)
     end
   end
 
   describe "notify_bs" do
-    it "passes an BSCalledEvent to notify_event" do
+    it "passes a BSCalledEvent to notify_players" do
       engine.stub(:previous_bid).and_return(nil)
-      engine.should_receive(:notify_event).with(an_instance_of(BSCalledEvent))
+      engine.should_receive(:notify_players).with(an_instance_of(BSCalledEvent))
+      engine.notify_bs(seat)
+    end
+
+    it "passes a BSCalledEvent to notify_watcher" do
+      engine.stub(:previous_bid).and_return(nil)
+      engine.should_receive(:notify_watcher).with(an_instance_of(BSCalledEvent))
       engine.notify_bs(seat)
     end
   end
 
   describe "notify_loser" do
-    it "passes an LoserEvent to notify_event" do
-      engine.should_receive(:notify_event).with(an_instance_of(LoserEvent))
+    it "passes a LoserEvent to notify_players" do
+      engine.should_receive(:notify_players).with(an_instance_of(LoserEvent))
+      engine.stub(:seats).and_return([])
+      engine.notify_loser(seat)
+    end
+
+    it "passes a LoserEvent to notify_watcher" do
+      engine.should_receive(:notify_watcher).with(an_instance_of(LoserEvent))
       engine.stub(:seats).and_return([])
       engine.notify_loser(seat)
     end
   end
 
   describe "notify_winner" do
-    it "passes an WinnerEvent to notify_event" do
-      engine.should_receive(:notify_event).with(an_instance_of(WinnerEvent))
+    it "passes a WinnerEvent to notify_players" do
+      engine.should_receive(:notify_players).with(an_instance_of(WinnerEvent))
+      engine.notify_winner(seat)
+    end
+
+    it "passes a WinnerEvent to notify_watcher" do
+      engine.should_receive(:notify_watcher).with(an_instance_of(WinnerEvent))
       engine.notify_winner(seat)
     end
   end
 
-  describe "notify_event" do
-    it "passes the event to all players" do
-      player1 = {}
+  describe "notify_players" do
+    let (:player1) { {} }
+    let (:player2) { {} }
+    let (:player3) { {} }
+    let (:watcher) { {} }
+
+    before do
+      player1.stub(:handle_event)
+      player2.stub(:handle_event)
+      player3.stub(:handle_event)
+
       s1 = Seat.new(0, player1, 5)
-      player2 = {}
       s2 = Seat.new(0, player2, 5)
-      player3 = {}
       s3 = Seat.new(0, player3, 5)
       engine.stub(:seats).and_return([s1, s2, s3])
+      engine.stub(:watcher).and_return(watcher)
+    end
 
+    it "passes the event to all players" do
       event = WinnerEvent.new(seat)
       player1.should_receive(:handle_event).with(event)
       player2.should_receive(:handle_event).with(event)
       player3.should_receive(:handle_event).with(event)
 
-      engine.notify_event(event)
+      engine.notify_players(event)
+    end
+
+    it "does not pass the event to the watcher" do
+      event = WinnerEvent.new(seat)
+      watcher.should_not_receive(:handle_event).with(event)
+
+      engine.notify_players(event)
+    end
+  end
+
+  describe "notify_watcher" do
+    let (:player1) { {} }
+    let (:player2) { {} }
+    let (:player3) { {} }
+    let (:watcher) { {} }
+
+    before do
+      watcher.stub(:handle_event)
+
+      s1 = Seat.new(0, player1, 5)
+      s2 = Seat.new(0, player2, 5)
+      s3 = Seat.new(0, player3, 5)
+      engine.stub(:seats).and_return([s1, s2, s3])
+      engine.stub(:watcher).and_return(watcher)
+    end
+
+    it "does not pass the event to any player" do
+      event = WinnerEvent.new(seat)
+      player1.should_not_receive(:handle_event).with(event)
+      player2.should_not_receive(:handle_event).with(event)
+      player3.should_not_receive(:handle_event).with(event)
+
+      engine.notify_watcher(event)
+    end
+
+    it "passes the event to the watcher" do
+      event = WinnerEvent.new(seat)
+      watcher.should_receive(:handle_event).with(event)
+
+      engine.notify_watcher(event)
     end
   end
 end

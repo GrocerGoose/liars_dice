@@ -1,14 +1,16 @@
 module LiarsDice
   class Engine
-    attr_accessor :seats, :starting_seat, :bids
+    include Watcher
+    attr_accessor :seats, :starting_seat, :bids, :watcher
 
-    def initialize(player_classes, dice_per_player)
+    def initialize(player_classes, dice_per_player, watcher=nil)
       self.seats = []
       player_classes.shuffle.each_with_index do |klass, i|
         player = klass.new(i, player_classes.count, dice_per_player)
         self.seats << Seat.new(i, player, dice_per_player)
       end
       @seat_index = 0
+      self.watcher = watcher || self
     end
 
     def run
@@ -85,6 +87,7 @@ module LiarsDice
 
         seat.dice = dice
       end
+      notify_roll
     end
 
     # ===========================================
@@ -92,27 +95,41 @@ module LiarsDice
     # ===========================================
     def notify_bid(seat, bid)
       event = BidMadeEvent.new(seat.number, bid)
-      notify_event(event)
+      notify_players(event)
+      notify_watcher(event)
     end
 
     def notify_bs(seat)
       event = BSCalledEvent.new(seat.number, previous_bid)
-      notify_event(event)
+      notify_players(event)
+      notify_watcher(event)
     end
 
     def notify_loser(seat)
       dice = seats.map(&:dice)
       event = LoserEvent.new(seat.number, dice)
-      notify_event(event)
+      notify_players(event)
+      notify_watcher(event)
     end
 
     def notify_winner(seat)
       event = WinnerEvent.new(seat.number)
-      notify_event(event)
+      notify_players(event)
+      notify_watcher(event)
     end
 
-    def notify_event(event)
+    def notify_roll
+      dice = seats.map(&:dice)
+      event = DiceRolledEvent.new(dice)
+      notify_watcher(event)
+    end
+
+    def notify_players(event)
       seats.each{|s| s.player.handle_event(event) }
+    end
+
+    def notify_watcher(event)
+      watcher.handle_event(event)
     end
 
     # ===========================================
