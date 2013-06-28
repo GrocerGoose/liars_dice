@@ -34,5 +34,9 @@ module LiarsDice
     def bs_called?
       true
     end
+
+    def to_s
+      "BS"
+    end
   end
 end

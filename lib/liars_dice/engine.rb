@@ -65,7 +65,7 @@ module LiarsDice
 
         if bid.bs_called?
           notify_bs(seat)
-          loser = bid_is_correct?(previous_bid, aces_wild) ? seat : previous_seat
+          self.loser = bid_is_correct?(previous_bid, aces_wild) ? seat : previous_seat
           notify_loser(loser)
           loser.lose_die
           break
