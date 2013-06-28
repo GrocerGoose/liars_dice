@@ -14,11 +14,11 @@ module LiarsDice
     end
 
     def run
-      until alive_seats.count == 1
+      until winner?
         roll_dice
         run_round
       end
-      notify_winner(alive_seats.first)
+      notify_winner
     end
 
     def get_bid(seat)
@@ -112,8 +112,8 @@ module LiarsDice
       notify_watcher(event)
     end
 
-    def notify_winner(seat)
-      event = WinnerEvent.new(seat.number)
+    def notify_winner
+      event = WinnerEvent.new(winner.number)
       notify_players(event)
       notify_watcher(event)
     end
@@ -170,6 +170,15 @@ module LiarsDice
 
     def alive_seats
       seats.select(&:alive?)
+    end
+
+    def winner?
+      alive_seats.count == 1
+    end
+
+    def winner
+      return nil unless winner?
+      alive_seats.first
     end
   end
 end

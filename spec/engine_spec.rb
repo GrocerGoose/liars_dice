@@ -20,6 +20,40 @@ describe "Engine" do
     end
   end
 
+  describe "winner?" do
+    let(:seat0) { OpenStruct.new(:alive? => true) }
+    let(:seat1) { OpenStruct.new(:alive? => true) }
+    let(:seat2) { OpenStruct.new(:alive? => false) }
+    let(:seat3) { OpenStruct.new(:alive? => false) }
+
+    it "returns true if there's one alive seat left" do
+      engine.stub(:seats).and_return([seat0, seat2, seat3])
+      engine.winner?.should be_true
+    end
+
+    it "returns false if there's more than one alive seat left" do
+      engine.stub(:seats).and_return([seat0, seat1, seat2, seat3])
+      engine.winner?.should be_false
+    end
+  end
+
+  describe "winner" do
+    let(:seat0) { OpenStruct.new(:alive? => true) }
+    let(:seat1) { OpenStruct.new(:alive? => true) }
+    let(:seat2) { OpenStruct.new(:alive? => false) }
+    let(:seat3) { OpenStruct.new(:alive? => false) }
+
+    it "returns nil if there isn't a winner" do
+      engine.stub(:seats).and_return([seat0, seat1, seat2, seat3])
+      engine.winner.should == nil
+    end
+
+    it "returns the sole alive seat" do
+      engine.stub(:seats).and_return([seat0, seat2, seat3])
+      engine.winner.should == seat0
+    end
+  end
+
   describe "#total_dice_with_face_value" do
     let(:seat0) { OpenStruct.new(dice: [2, 2, 3]) }
     let(:seat1) { OpenStruct.new(dice: [4, 2, 3]) }
@@ -308,12 +342,14 @@ describe "Engine" do
   describe "notify_winner" do
     it "passes a WinnerEvent to notify_players" do
       engine.should_receive(:notify_players).with(an_instance_of(WinnerEvent))
-      engine.notify_winner(seat)
+      engine.stub(:winner).and_return(seat)
+      engine.notify_winner
     end
 
     it "passes a WinnerEvent to notify_watcher" do
       engine.should_receive(:notify_watcher).with(an_instance_of(WinnerEvent))
-      engine.notify_winner(seat)
+      engine.stub(:winner).and_return(seat)
+      engine.notify_winner
     end
   end
 
