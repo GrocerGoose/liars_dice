@@ -2,6 +2,7 @@ module LiarsDice
   class Engine
     include Watcher
     attr_accessor :seats, :starting_seat, :bids, :watcher
+    attr_reader :loser, :seat_index
 
     def initialize(player_classes, dice_per_player, watcher=nil)
       self.seats = []
@@ -9,7 +10,7 @@ module LiarsDice
         player = klass.new(i, player_classes.count, dice_per_player)
         self.seats << Seat.new(i, player, dice_per_player)
       end
-      @seat_index = 0
+      self.seat_index = 0
       self.watcher = watcher || self
     end
 
@@ -33,9 +34,8 @@ module LiarsDice
       # If no seats are alive, we'd loop forever
       return nil if alive_seats.empty?
 
-      seat = seats[@seat_index]
-      @seat_index += 1
-      @seat_index = 0 if @seat_index == seats.count
+      seat = seats[seat_index]
+      self.seat_index += 1
 
       # If the seat at seat_index is alive, return it
       # Otherwise, we've already updated seat_index (and wrapped it, if necessary)
@@ -170,6 +170,16 @@ module LiarsDice
 
     def alive_seats
       seats.select(&:alive?)
+    end
+
+    def loser=(seat)
+      @loser = seat
+      self.seat_index = seat.number + 1
+    end
+
+    def seat_index=(index)
+      @seat_index = index
+      @seat_index = 0 if @seat_index == seats.count
     end
   end
 end
