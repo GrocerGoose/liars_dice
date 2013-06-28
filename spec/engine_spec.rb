@@ -181,6 +181,12 @@ describe "Engine" do
       engine.stub(:alive_seats).and_return([s1, s2])
       engine.roll_dice
     end
+
+    it "notifies after rolling" do
+      engine.should_receive(:notify_roll)
+      engine.stub(:alive_seats).and_return([])
+      engine.roll_dice
+    end
   end
 
   describe "#valid_bid?" do
