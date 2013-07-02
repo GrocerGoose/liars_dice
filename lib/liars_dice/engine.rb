@@ -20,6 +20,7 @@ module LiarsDice
         run_round
       end
       notify_winner
+      nil
     end
 
     def get_bid(seat)
