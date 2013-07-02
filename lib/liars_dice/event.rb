@@ -54,4 +54,13 @@ module LiarsDice
       super("Game is over.  Seat #{seat_number} is the winner.")
     end
   end
+
+  class SeatsAssignedEvent < Event
+    attr_accessor :seat_assignments
+
+    def initialize(seats)
+      self.seat_assignments = {}
+      seats.each{|seat| self.seat_assignments[seat.number] = seat.player.class }
+    end
+  end
 end

@@ -15,6 +15,7 @@ module LiarsDice
     end
 
     def run
+      notify_seats
       until winner?
         roll_dice
         run_round
@@ -122,6 +123,11 @@ module LiarsDice
     def notify_roll
       dice = seats.map(&:dice)
       event = DiceRolledEvent.new(dice)
+      notify_watcher(event)
+    end
+
+    def notify_seats
+      event = SeatsAssignedEvent.new(seats)
       notify_watcher(event)
     end
 

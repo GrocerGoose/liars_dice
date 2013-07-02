@@ -1,6 +1,6 @@
 module LiarsDice
   module Watcher
-    attr_reader :after_roll, :after_bid, :after_round, :after_bs, :after_game, :after_dice_rolled
+    attr_reader :after_roll, :after_bid, :after_round, :after_bs, :after_game, :after_dice_rolled, :after_seats_assigned
 
     def append_after_bid(callback)
       append_callback(:after_bid, callback)
@@ -22,6 +22,10 @@ module LiarsDice
       append_callback(:after_dice_rolled, callback)
     end
 
+    def append_after_seats_assigned(callback)
+      append_callback(:after_seats_assigned, callback)
+    end
+
     def handle_event(event)
       if event.is_a? BidMadeEvent
         fire(:after_bid, event.seat_number, event.bid)
@@ -33,12 +37,14 @@ module LiarsDice
         fire(:after_game, event.seat_number)
       elsif event.is_a? DiceRolledEvent
         fire(:after_dice_rolled, event.dice)
+      elsif event.is_a? SeatsAssignedEvent
+        fire(:after_seats_assigned, event.seat_assignments)
       end
     end
 
     private
     def allowed_callbacks
-      [:after_bid, :after_bs, :after_dice_rolled, :after_game, :after_round]
+      [:after_bid, :after_bs, :after_dice_rolled, :after_game, :after_round, :after_seats_assigned]
     end
 
     def append_callback(callback_name, callback)
