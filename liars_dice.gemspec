@@ -1,7 +1,7 @@
 Gem::Specification.new do |gem|
   gem.name = 'liars_dice'
-  gem.version = '0.0.2'
-  gem.date = '2013-07-02'
+  gem.version = '0.0.3'
+  gem.date = '2013-07-09'
   gem.summary = "Liar's Dice game"
   gem.description = "A liar's dice botting environment, developed by Aisle50"
   gem.authors = ['Ben Schmeckpeper', 'Chris Doyle', 'Max Page', 'Molly Struve']
