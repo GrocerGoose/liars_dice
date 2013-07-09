@@ -25,11 +25,7 @@ module LiarsDice
     end
 
     def get_bid(seat)
-      bid = seat.player.bid
-      unless valid_bid?(bid)
-        raise StandardError.new("Invalid Bid")
-      end
-      bid
+      seat.player.bid
     end
 
     def next_seat
@@ -63,20 +59,32 @@ module LiarsDice
       while true
         seat = next_seat
         bid = get_bid(seat)
-        aces_wild = false if bid.face_value == 1
 
-        if bid.bs_called?
-          notify_bs(seat)
-          self.loser = bid_is_correct?(previous_bid, aces_wild) ? seat : previous_seat
-          notify_loser(loser)
-          loser.lose_die
+        # An invalid bid ends the round and costs the bidder a die
+        unless valid_bid?(bid)
+          self.loser = seat
+          notify_invalid_bid(seat)
           break
         end
 
+        # If someone calls BS, figure out the loser and exit the loop
+        if bid.bs_called?
+          notify_bs(seat)
+          self.loser = bid_is_correct?(previous_bid, aces_wild) ? seat : previous_seat
+          break
+        end
+
+        # For a valid, non-BS bid, update wilds, record and notify the bid and prepare for the next bid
+        aces_wild = false if bid.face_value == 1
         self.bids << bid
         notify_bid(seat, bid)
         previous_seat = seat
       end
+
+      # It's an error if we get here without having set a loser
+      raise StandardError.new("Unknown loser") unless loser
+      notify_loser(loser)
+      loser.lose_die
     end
 
     def roll_dice
@@ -103,6 +111,12 @@ module LiarsDice
 
     def notify_bs(seat)
       event = BSCalledEvent.new(seat.number, previous_bid)
+      notify_players(event)
+      notify_watcher(event)
+    end
+
+    def notify_invalid_bid(seat)
+      event = InvalidBidEvent.new(seat.number)
       notify_players(event)
       notify_watcher(event)
     end

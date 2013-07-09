@@ -8,6 +8,7 @@ module LiarsDice
       append_after_bs lambda{|seat| puts "Seat #{seat} calls BS" }
       append_after_game lambda{|winner| puts "Game over.  Seat #{winner} wins." }
       append_after_round lambda{|loser| puts "Seat #{loser} loses a die" }
+      append_after_invalid_bid lambda{|loser| puts "Seat #{loser} made an invalid bid" }
       append_after_seats_assigned lambda{|assignments| assignments.each{|number, name| puts "Seat #{number}: #{name}" } }
     end
   end

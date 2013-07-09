@@ -36,6 +36,15 @@ module LiarsDice
     end
   end
 
+  class InvalidBidEvent < Event
+    attr_accessor :seat_number
+
+    def initialize(seat_number)
+      self.seat_number = seat_number
+      super("Seat #{seat_number} made an invalid bid")
+    end
+  end
+
   class LoserEvent < Event
     attr_accessor :seat_number, :dice
 

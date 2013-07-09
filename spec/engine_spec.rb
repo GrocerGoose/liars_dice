@@ -69,6 +69,12 @@ describe "Engine" do
         engine.stub_chain(:loser, :lose_die)
       end
 
+      it "picks the bidder if the bid was invalid" do
+        engine.stub(:valid_bid?).and_return(false)
+        engine.should_receive(:loser=).with(seat1)
+        engine.run_round
+      end
+
       it "picks the bidder if the bid was incorrect" do
         engine.stub(:bid_is_correct?).and_return(false)
         engine.should_receive(:loser=).with(seat1)
@@ -164,13 +170,7 @@ describe "Engine" do
     end
 
     it "gets a bid from the seat's user" do
-      engine.stub(:valid_bid?).and_return(true)
       engine.get_bid(seat).should == "bid"
-    end
-
-    it "raises an error if given an invalid bid" do
-      engine.stub(:valid_bid?).and_return(false)
-      expect { engine.get_bid(seat) }.to raise_error
     end
   end
 
