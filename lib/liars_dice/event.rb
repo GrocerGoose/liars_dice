@@ -69,7 +69,11 @@ module LiarsDice
 
     def initialize(seats)
       self.seat_assignments = {}
-      seats.each{|seat| self.seat_assignments[seat.number] = seat.player.class.to_s }
+      seats.each do |seat|
+        name = seat.player.name if seat.player.respond_to? :name
+        name ||= seat.player.class.to_s
+        self.seat_assignments[seat.number] = name
+      end
     end
   end
 end
