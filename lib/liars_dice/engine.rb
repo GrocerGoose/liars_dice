@@ -89,7 +89,7 @@ module LiarsDice
 
     def roll_dice
       die = (1..6).to_a
-      alive_seats.each do |seat|
+      seats.each do |seat|
         dice = []
         seat.dice_left.times do
           dice << die.sample
