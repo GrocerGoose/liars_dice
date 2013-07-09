@@ -69,7 +69,7 @@ module LiarsDice
 
     def initialize(seats)
       self.seat_assignments = {}
-      seats.each{|seat| self.seat_assignments[seat.number] = seat.player.class }
+      seats.each{|seat| self.seat_assignments[seat.number] = seat.player.class.to_s }
     end
   end
 end
