@@ -326,7 +326,7 @@ describe "Engine" do
       before do
         # Roll the dice a bunch of times and capture the result in a hash
         # keyed by die face_value
-        engine.stub(:alive_seats).and_return([seat])
+        engine.stub(:seats).and_return([seat])
         seat.stub(:dice_left).and_return(6000)
         rolled_dice = []
         seat.stub(:dice=) { |val| rolled_dice = val }
@@ -347,13 +347,13 @@ describe "Engine" do
       end
     end
 
-    it "only rolls dice for seats that are alive" do
+    it "rolls dice for all seats" do
       s1 = Seat.new(0, {}, 5)
       s1.stub(:alive?).and_return(false)
       s2 = Seat.new(1, {}, 5)
       s2.stub(:alive?).and_return(true)
       engine.stub(:seats).and_return([s1, s2])
-      s1.should_not_receive(:dice=)
+      s1.should_receive(:dice=)
       s2.should_receive(:dice=)
       engine.roll_dice
     end
