@@ -6,7 +6,7 @@ module LiarsDice
 
     def initialize
       self.names = {}
-      append_after_dice_rolled lambda{|dice| puts "Dice Rolled: #{dice.inspect.to_s}" }
+      append_after_dice_rolled method(:print_dice)
       append_after_bid lambda{|seat, bid| puts "#{name(seat, true)} bids #{bid}" }
       append_after_bs lambda{|seat| puts "#{name(seat)} calls BS" }
       append_after_game lambda{|winner| puts "Game over.  #{name(winner)} wins." }
@@ -27,6 +27,12 @@ module LiarsDice
     def names=(value)
       @names = value
       @names.each{|number, name| puts "Seat #{number}: #{name}" }
+    end
+
+    def print_dice(dice)
+      dice.each_with_index { |roll, seat| puts "#{name(seat, true)} Rolled: #{roll.inspect.to_s}" }
+      all_dice = dice.flatten
+      (1..6).to_a.each {|face_value| puts Bid.new(all_dice.select{|d| d == face_value}.count, face_value) }
     end
   end
 end
