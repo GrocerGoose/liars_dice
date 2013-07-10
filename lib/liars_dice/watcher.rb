@@ -1,32 +1,31 @@
 module LiarsDice
   module Watcher
-    attr_reader :after_roll, :after_bid, :after_round, :after_bs, :after_game, :after_dice_rolled, :after_seats_assigned, :after_invalid_bid
 
-    def append_after_bid(callback)
+    def after_bid(callback)
       append_callback(:after_bid, callback)
     end
 
-    def append_after_round(callback)
+    def after_round(callback)
       append_callback(:after_round, callback)
     end
 
-    def append_after_bs(callback)
+    def after_bs(callback)
       append_callback(:after_bs, callback)
     end
 
-    def append_after_game(callback)
+    def after_game(callback)
       append_callback(:after_game, callback)
     end
 
-    def append_after_dice_rolled(callback)
+    def after_dice_rolled(callback)
       append_callback(:after_dice_rolled, callback)
     end
 
-    def append_after_seats_assigned(callback)
+    def after_seats_assigned(callback)
       append_callback(:after_seats_assigned, callback)
     end
 
-    def append_after_invalid_bid(callback)
+    def after_invalid_bid(callback)
       append_callback(:after_invalid_bid, callback)
     end
 
@@ -54,15 +53,19 @@ module LiarsDice
     end
 
     def append_callback(callback_name, callback)
-      raise ArgumentError.new("Callback does not respond to call") unless callback.respond_to? :call
       raise ArgumentError.new("Unsupported callback #{callback_name}") unless allowed_callbacks.include? callback_name
+      raise ArgumentError.new("Callback does not respond to call") unless callback.respond_to?(:call) or callback.is_a? Symbol
       watcher_callbacks[callback_name] << callback
     end
 
     def fire(callback_name, *args)
       raise ArgumentError.new("Unsupported callback #{callback_name}") unless allowed_callbacks.include? callback_name
       watcher_callbacks[callback_name].each do |callback|
-        callback.call(*args)
+        if callback.is_a? Symbol
+          send(callback, *args)
+        else
+          callback.call(*args)
+        end
       end
     end
 

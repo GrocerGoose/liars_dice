@@ -6,7 +6,7 @@ module LiarsDice
 
     def play(bot_classes)
       w = LiarsDice::CommandLineWatcher.new
-      w.append_after_round lambda { |*args| gets }
+      w.after_round lambda { |*args| gets }
       e = LiarsDice::Engine.new(bot_classes, 5, w)
       e.run
     end

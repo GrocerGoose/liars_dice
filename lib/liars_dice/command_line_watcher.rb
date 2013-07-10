@@ -6,13 +6,13 @@ module LiarsDice
 
     def initialize
       self.names = {}
-      append_after_dice_rolled method(:print_dice)
-      append_after_bid lambda{|seat, bid| puts "#{name(seat, true)} bids #{bid}" }
-      append_after_bs lambda{|seat| puts "#{name(seat)} calls BS" }
-      append_after_game lambda{|winner| puts "Game over.  #{name(winner)} wins." }
-      append_after_round lambda{|loser| puts "#{name(loser)} loses a die" }
-      append_after_invalid_bid lambda{|seat| puts "#{name(seat)} made an invalid bid" }
-      append_after_seats_assigned lambda{|assignments| self.names = assignments }
+      after_dice_rolled :print_dice
+      after_bid lambda{|seat, bid| puts "#{name(seat, true)} bids #{bid}" }
+      after_bs lambda{|seat| puts "#{name(seat)} calls BS" }
+      after_game lambda{|winner| puts "Game over.  #{name(winner)} wins." }
+      after_round lambda{|loser| puts "#{name(loser)} loses a die" }
+      after_invalid_bid lambda{|seat| puts "#{name(seat)} made an invalid bid" }
+      after_seats_assigned lambda{|assignments| self.names = assignments }
     end
 
     def name(seat_number, justified=false)
