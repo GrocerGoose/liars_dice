@@ -1,10 +1,11 @@
 module LiarsDice
   module Bots
     class HumanBot
-      attr_accessor :prev_bid, :dice, :seat_number
+      attr_accessor :prev_bid, :dice, :seat_number, :name
 
       def initialize(seat_number, number_of_players, number_of_dice)
         self.seat_number = seat_number
+        self.name = "HumanBot"
         puts "You're playing as HumanBot in seat #{seat_number}"
         puts "When asked for a bid, either enter <TOTAL> <FACE_VALUE> or BS"
       end

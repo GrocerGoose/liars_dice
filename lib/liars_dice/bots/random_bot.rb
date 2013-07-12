@@ -1,9 +1,11 @@
 module LiarsDice
   module Bots
     class RandomBot
-      attr_accessor :prev_bid
+      attr_accessor :prev_bid, :name
 
-      def initialize(seat_number, number_of_players, number_of_dice); end
+      def initialize(seat_number, number_of_players, number_of_dice)
+        self.name = "RandomBot#{seat_number}"
+      end
 
 
       def handle_event(event)
