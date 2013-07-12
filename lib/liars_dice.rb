@@ -5,5 +5,4 @@ require 'liars_dice/event'
 require 'liars_dice/game'
 require 'liars_dice/seat'
 require 'liars_dice/command_line_watcher'
-require 'liars_dice/bots/random_bot'
-require 'liars_dice/bots/human_bot'
+Dir[File.dirname(__FILE__) + '/liars_dice/bots/*.rb'].each {|file| require file }
