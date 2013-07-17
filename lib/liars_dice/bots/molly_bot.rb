@@ -87,7 +87,7 @@ module LiarsDice
           LiarsDice::Bid.new(magic_number, prev_bid.face_value)
         else
           if prev_bid.face_value == 6 && (prev_bid.total+1) < all_dice_count/(2*expected_prob)
-            LiarsDice::Bid.new(prev_bid.total, most_bid)
+            LiarsDice::Bid.new(prev_bid.total+1, most_bid)
           elsif prev_bid.face_value < 6 && (prev_bid.total+1) < all_dice_count/(2*expected_prob)
             LiarsDice::Bid.new(prev_bid.total, prev_bid.face_value+1)
           else
