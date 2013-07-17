@@ -55,13 +55,13 @@ module LiarsDice
       end
 
       def starting_bid
-        b = number_of_dice/3 - 1
+        b = all_dice_count/3 - 1
         b = 1 if b < 1
         LiarsDice::Bid.new(b, [5, 6].sample)
       end
 
       def magic_number
-        dice.count(prev_bid.face_value) + all_dice_count/(3*expected_prob)
+        dice_count_of_bid + all_dice_count/(4*expected_prob)
       end
 
       def expected_prob
@@ -70,7 +70,7 @@ module LiarsDice
       end
 
       def comment
-        [":-P", "Crap", "This just got interesting", ":-/"].sample
+        "So you say #{prev_bid.total}, #{prev_bid.face_value}.., #{[":-P", "AHHH!", "This just got interesting", ":-/"].sample}"
       end
 
       # 1/3 * total dice
@@ -81,17 +81,18 @@ module LiarsDice
       def bid
         return starting_bid unless prev_bid
         if prev_bid.total >= all_dice_count/(2*expected_prob) && prev_bid.total > dice_count_of_bid
-          # puts comment
+          puts comment
           LiarsDice::BS.new
         elsif prev_bid.total < magic_number && magic_number < all_dice_count
-          LiarsDice::Bid.new(prev_bid.total + 1, prev_bid.face_value)
+          LiarsDice::Bid.new(magic_number, prev_bid.face_value)
         else
-          r = LiarsDice::Bid.new(prev_bid.total, prev_bid.face_value + 1)
-          if r.face_value > 6
-            r.total += 1
-            r.face_value = 2
+          if prev_bid.face_value == 6 && (prev_bid.total+1) < all_dice_count/(2*expected_prob)
+            LiarsDice::Bid.new(prev_bid.total, most_bid)
+          elsif prev_bid.face_value < 6 && (prev_bid.total+1) < all_dice_count/(2*expected_prob)
+            LiarsDice::Bid.new(prev_bid.total, prev_bid.face_value+1)
+          else
+            LiarsDice::BS.new
           end
-          r
         end
       end
     end
